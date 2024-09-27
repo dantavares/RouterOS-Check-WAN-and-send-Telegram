@@ -1,0 +1,43 @@
+:local ckonline do={
+   #Insert this netwatch Host
+   #I recommend using a root server closer to you: root-servers.org
+   :local HOST "199.7.83.42"
+
+   #Insert your BOT Token
+   :local BOTOK ""
+
+   #Insert your ChatID (Telegram Room)
+   :local CHATID ""
+   
+   :local sub1 ([/system identity get name])
+   :local sub2 ([/system clock get time])
+   :local sub3 ([/system clock get date])
+   :local tonline "$INT Online @ $sub1 @ $sub2 @ $sub3"
+   :local toffline "$INT Offline @ $sub1 @ $sub2 @ $sub3"
+   
+   :global status $status
+   :if ([/ping $HOST interface=$INT interval=1 count=10] = 0) do={
+      :if ( "$status" != "$INT Offline" ) do={
+         /tool fetch url="https://api.telegram.org/bot$BOTOK/sendMessage\?chat_id=$CHATID&text=$toffline"
+         :global status "$INT Offline";
+         :log error $toffline;
+      }
+   } else {
+      :if ( "$status" != "$INT Online" ) do={
+         /tool fetch url="https://api.telegram.org/bot$BOTOK/sendMessage\?chat_id=$CHATID&text=$tonline"
+         :global status "$INT Online";
+         :log warning $tonline;
+      }
+   }
+   :return $status
+}
+
+#####################################################################
+# Create a global variable for every adaptor to check
+# Example:
+# :global GLOBALVARIABLE1 [ $ckonline INT=INTERFACENAME1 status=$GLOBALVARIABLE1 ]
+# :global GLOBALVARIABLE2 [ $ckonline INT=INTERFACENAME2 status=$GLOBALVARIABLE2 ]
+#####################################################################
+
+:global STATUS1 [$ckonline INT=WAN1 status=$STATUS1]
+:global STATUS2 [$ckonline INT=WAN2 status=$STATUS2]
