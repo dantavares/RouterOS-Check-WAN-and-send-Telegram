@@ -39,5 +39,3 @@
 # :global GLOBALVARIABLE2 [ $ckonline INT=INTERFACENAME2 status=$GLOBALVARIABLE2 ]
 #####################################################################
 
-:global STATUS1 [$ckonline INT=WAN1 status=$STATUS1]
-:global STATUS2 [$ckonline INT=WAN2 status=$STATUS2]
