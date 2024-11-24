@@ -6,18 +6,14 @@
 # If you still get locked out, go cry at your mom's house for 10 days and try again
 
 # Protected ports, separated by comma
-:global ports "8291,22"
-
-# Number of access attempts before being blocked
-# The value should be the number of attempts -1
-:global bully "4"
+:local ports "8291,22"
 
 # Knock on the door if you are locked out
-:global kport "26969" 
+:local kport "26969" 
 
 /ip firewall filter
 add action=accept chain=input src-address-list=anti-lockout
-add action=accept chain=input connection-state=new dst-limit=1/1m,$bully,src-address/1m40s dst-port=$ports protocol=tcp src-address-list=!blacklist
+add action=accept chain=input connection-state=new dst-limit=1/1m,4,src-address/1m40s dst-port=$ports protocol=tcp src-address-list=!blacklist
 add action=drop chain=input connection-state=new dst-port=$ports protocol=tcp src-address-list=blacklist
 add action=add-src-to-address-list address-list=blacklist address-list-timeout=1w3d chain=input connection-state=new dst-port=$ports protocol=tcp
 add action=add-src-to-address-list address-list=anti-lockout address-list-timeout=1m chain=input dst-port=$kport protocol=tcp
