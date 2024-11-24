@@ -36,7 +36,7 @@
 
 ##################################################################################################
 # Create a global variable for every interface to check:
-# :global GLOBALVARIABLE1 [ $ckonline INT=INTERFACENAME1 HOST=SOMEHOST1 status=$GLOBALVARIABLE1 ]
+# :global GLOBALVARIABLE [ $ckonline INT=INTERFACENAME HOST=SOMEHOST status=$GLOBALVARIABLE ]
 # Examples:
 # :global WAN1 [ $ckonline INT=ether1 HOST=8.8.8.8 status=$WAN1 ]
 # :global WAN2 [ $ckonline INT=ether2 HOST=1.1.1.1 status=$WAN2 ]
