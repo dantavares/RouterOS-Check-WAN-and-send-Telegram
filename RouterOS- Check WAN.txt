@@ -1,13 +1,10 @@
 :local ckonline do={
-   #Insert this netwatch Host
-   #I recommend using a root server closer to you: root-servers.org
-   :local HOST "199.7.83.42"
-
+   
    #Insert your BOT Token
-   :local BOTOK ""
+   :local BOTOK "BOT Token"
 
    #Insert your ChatID (Telegram Room)
-   :local CHATID ""
+   :local CHATID "Chat ID Room"
    
    :local sub1 ([/system identity get name])
    :local sub2 ([/system clock get time])
@@ -16,7 +13,11 @@
    :local toffline "$INT Offline @ $sub1 @ $sub2 @ $sub3"
    
    :global status $status
+
+   /ip/route enable [find comment=$INT];
+   delay 4;
    :if ([/ping $HOST interface=$INT interval=1 count=10] = 0) do={
+      /ip/route disable [find comment=$INT];
       :if ( "$status" != "$INT Offline" ) do={
          /tool fetch url="https://api.telegram.org/bot$BOTOK/sendMessage\?chat_id=$CHATID&text=$toffline"
          :global status "$INT Offline";
@@ -29,13 +30,19 @@
          :log warning $tonline;
       }
    }
+   
    :return $status
 }
 
-#####################################################################
-# Create a global variable for every adaptor to check
+##################################################################################################
+# Create a global variable for every interface to check
 # Example:
-# :global GLOBALVARIABLE1 [ $ckonline INT=INTERFACENAME1 status=$GLOBALVARIABLE1 ]
-# :global GLOBALVARIABLE2 [ $ckonline INT=INTERFACENAME2 status=$GLOBALVARIABLE2 ]
-#####################################################################
+# :global GLOBALVARIABLE1 [ $ckonline INT=INTERFACENAME1 HOST=SOMEHOST1 status=$GLOBALVARIABLE1 ]
+# :global GLOBALVARIABLE2 [ $ckonline INT=INTERFACENAME2 HOST=SOMEHOST2 status=$GLOBALVARIABLE2 ]
+##################################################################################################
+# Put a comment, with the exact name of the interface in their respective routes, if you want the 
+# script to deactivate and activate the route if it is offline or online.
+##################################################################################################
 
+:global WAN1 [ $ckonline INT=ether1 HOST=8.8.8.8 status=$WAN1 ]
+:global WAN2 [ $ckonline INT=ether2 HOST=1.1.1.1 status=$WAN2 ]
