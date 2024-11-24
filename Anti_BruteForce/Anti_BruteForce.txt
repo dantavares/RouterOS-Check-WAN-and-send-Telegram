@@ -1,0 +1,23 @@
+# Blocks if someone keeps messing with a specific port, in this case it's 8291 and 22, change it as you wish
+# If you fall into your own trap, don't despair, just knock on door 26969 and enter normally
+# just don't take too long (1 minute), but only you can know that! I recommend you change it...
+# Don't change the order of the rules, otherwise your Mikrotik will be possessed by an evil spirit!
+# For IPv6, change "/ip" to "/ipv6" in the first line
+# If you still get locked out, go cry at your mom's house for 10 days and try again
+
+# Protected ports, separated by comma
+:global ports "8291,22"
+
+# Number of access attempts before being blocked
+# The value should be the number of attempts -1
+:global bully "4"
+
+# Knock on the door if you are locked out
+:global kport "26969" 
+
+/ip firewall filter
+add action=accept chain=input src-address-list=anti-lockout
+add action=accept chain=input connection-state=new dst-limit=1/1m,$bully,src-address/1m40s dst-port=$ports protocol=tcp src-address-list=!blacklist
+add action=drop chain=input connection-state=new dst-port=$ports protocol=tcp src-address-list=blacklist
+add action=add-src-to-address-list address-list=blacklist address-list-timeout=1w3d chain=input connection-state=new dst-port=$ports protocol=tcp
+add action=add-src-to-address-list address-list=anti-lockout address-list-timeout=1m chain=input dst-port=$kport protocol=tcp
