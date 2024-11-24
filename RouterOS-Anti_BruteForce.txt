@@ -1,0 +1,23 @@
+# Simples filtro de firewall para Router OS
+# Bloqueia se alguem ficar bulinando na porta específica, no caso aqui é a 8291 (winbox), altere na sua vontade
+# Se você cair na própria armadilha, não se desespere, apenas bata na porta 26969 e entre normalmente
+# (só não demore muito) mas só você pode saber disso!
+# Caso queira diminuir ou aumentar o numero de tentativas altere o valor do "Burst" na regra "1"
+# Não altere a ordem das regras, senão seu Mikrotik será possuído por um espírito maligno!
+# Para IPv6, altere de "/ip" para "/ipv6" na primeira linha
+# Se mesmo assim você ficar trancado pra fora, vá chorar na casa da sua mamãe por 10 dias e tente novamente
+
+/ip firewall filter
+add action=accept chain=input comment="Anti Lockout" src-address-list=anti-lockout
+add action=accept chain=input comment="Max 5 tentativas de novas conexoes" connection-state=new \
+    dst-limit=1/1m,4,src-address/1m40s dst-port=8291,22 protocol=tcp src-address-list=!blacklist
+add action=drop chain=input comment="Bloqueia Lista Negra" connection-state=new dst-port=8291,22 \
+    protocol=tcp src-address-list=blacklist
+add action=add-src-to-address-list address-list=blacklist address-list-timeout=1w3d chain=input \
+    comment="6a nova conexao em menos de 1 minuto, entra na lista negra por 10 dias" \
+    connection-state=new dst-port=8291,22 protocol=tcp
+add action=add-src-to-address-list address-list=anti-lockout address-list-timeout=1m chain=input \
+    comment="Em caso de emergencia, bata na porta 26969 para entrar de novo" dst-port=26969 \
+    protocol=tcp
+add action=drop chain=input comment="Bloqueia acesso da config web pela wan" dst-port=8080 \
+    in-interface=!bridge protocol=tcp
